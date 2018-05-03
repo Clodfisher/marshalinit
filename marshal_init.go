@@ -1,7 +1,22 @@
 package marshalinit
 
-func MarshalFile(filename string, data interface{}) error {
+import (
+	"io/ioutil"
+	"strings"
+	"reflect"
+	"errors"
+)
 
+/*
+	将结构体中的数据，进行序列化成切换，将切片内容写入到文件内
+*/
+func MarshalFile(filename string, data interface{}) error {
+	result, err := Marshal(data)
+	if err != nil{
+		return err
+	}
+
+	return ioutil.WriteFile(filename, result, 0755})
 }
 
 /*
@@ -11,8 +26,16 @@ func Marshal(data interface{}) ([]byte, error) {
 
 }
 
+/*
+	从文件中读取数据，将读取的数据反序列化成结构体中的数据
+*/
 func UnMarshalFile(filename string, result interface{}) error {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
 
+	return UnMarshal(data, result)
 }
 
 /*
@@ -20,4 +43,35 @@ func UnMarshalFile(filename string, result interface{}) error {
 */
 func UnMarshal(data []byte, result interface{}) error {
 
+	//用于存储反序列化结果的变量是否为指针类型，否直接报错
+	typeInfo := reflect.TypeOf(result)
+	if typeInfo.Kind() != reflect.Ptr {
+		return errors.New("please pass address for receive result")
+	}
+
+	//判断指针执行的内存存储的类型是否为结构体，否则直接包括
+	typeStruct := typeInfo.Elem()
+	if typeStruct.Kind() != reflect.Struct {
+		return errors.New("please pass address for struct")
+	}
+
+	lineArr := strings.Split(string(data), "\n")
+	for index, line := range lineArr  {
+		line = strings.TrimSpace(line)
+
+		//空行
+		if 0 == len(line) {
+			continue
+		}
+
+		//如果是注释，直接忽略
+		if '#' == line[0] || ';' == line[0] {
+			continue
+		}
+
+		//解析section，即【XXX】
+
+		//解析item，即 key=value
+
+	}
 }
