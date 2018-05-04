@@ -69,7 +69,11 @@ func UnMarshal(data []byte, result interface{}) error {
 			continue
 		}
 
-		//解析section，即【XXX】
+		//解析section，即[XXX]
+		if '[' == line[0] {
+			fileName, err := parseSection(line, typeInfo)
+
+		}
 
 		//解析item，即 key=value
 
