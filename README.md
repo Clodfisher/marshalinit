@@ -84,5 +84,5 @@ func Marshal(data interface{}) (result []byte, err error)
  4. 通过section类型中的tag获取其在切片数据中应该具有的名字。    
  5. 将名字和[]组成在切片中的section内容。    
  6. 将每个section下的所有item以同样的方式组成key=value对。    
- 7. 将所有的序列化好的数据按照解析的顺序，写入到result切片中。    
- 8. 完成真个序列化的过程。    
+ 7. 将所有的序列化好的数据按照解析顺序，写入到result切片中。    
+ 8. 完成整个序列化过程。    
