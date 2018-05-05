@@ -1,10 +1,11 @@
 package marshalinit
 
 import (
-	"io/ioutil"
-	"strings"
-	"reflect"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"reflect"
+	"strings"
 )
 
 /*
@@ -12,18 +13,18 @@ import (
 */
 func MarshalFile(filename string, data interface{}) error {
 	result, err := Marshal(data)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
-	return ioutil.WriteFile(filename, result, 0755})
+	return ioutil.WriteFile(filename, result, 0755)
 }
 
 /*
  序列化：将数据结构中的数据，序列化成切片数据，可以输出到文件或是进行网络传输。
 */
 func Marshal(data interface{}) ([]byte, error) {
-
+	return nil, nil
 }
 
 /*
@@ -56,7 +57,8 @@ func UnMarshal(data []byte, result interface{}) error {
 	}
 
 	lineArr := strings.Split(string(data), "\n")
-	for index, line := range lineArr  {
+	var lastSectionName string
+	for index, line := range lineArr {
 		line = strings.TrimSpace(line)
 
 		//空行
@@ -71,11 +73,20 @@ func UnMarshal(data []byte, result interface{}) error {
 
 		//解析section，即[XXX]
 		if '[' == line[0] {
-			fileName, err := parseSection(line, typeInfo)
-
+			var err error
+			lastSectionName, err = parseSection(line, typeStruct)
+			if err != nil {
+				return fmt.Errorf("%v lineno:%d", err, index+1)
+			}
+			continue
 		}
 
 		//解析item，即 key=value
-
+		err := parseItem(lastSectionName, line, result)
+		if err != nil {
+			return fmt.Errorf("%v lineno:%d", err, index+1)
+		}
 	}
+
+	return nil
 }
