@@ -24,7 +24,53 @@ func MarshalFile(filename string, data interface{}) error {
  序列化：将数据结构中的数据，序列化成切片数据，可以输出到文件或是进行网络传输。
 */
 func Marshal(data interface{}) ([]byte, error) {
-	return nil, nil
+	typeInfo := reflect.TypeOf(data)
+	if typeInfo.Kind() != reflect.Struct {
+		return nil, errors.New("please pass struct")
+	}
+
+	valueInfo := reflect.ValueOf(data)
+	var conf []string //用于存储从结构体每一项的string数据，最后转换成byte切片
+	for i := 0; i < typeInfo.NumField(); i++ {
+		sectionField := typeInfo.Field(i)
+		sectionValue := valueInfo.Field(i)
+
+		sectionType := sectionField.Type
+		if sectionType.Kind() != reflect.Struct {
+			continue
+		}
+
+		sectionTagName := sectionField.Tag.Get("init")
+		if len(sectionTagName) == 0 {
+			//没有tag名字，就用本身数据结构类型的名字
+			sectionTagName = sectionField.Name
+		}
+
+		section := fmt.Sprintf("\n[%s]\n", sectionTagName)
+		conf = append(conf, section)
+
+		//获取每个section中的每一个item
+		for j := 0; j < sectionType.NumField(); j++ {
+			itemField := sectionType.Field(j)
+			itemValue := sectionValue.Field(j)
+
+			itemTagName := itemField.Tag.Get("init")
+			if len(itemTagName) == 0 {
+				itemTagName = itemField.Name
+			}
+			//不用判定itemValue的类型，直接用接口方式，用%v进行格式化输出
+			item := fmt.Sprintf("%s=%v\n", itemTagName, itemValue.Interface())
+			conf = append(conf, item)
+		}
+	}
+
+	var result []byte
+	for _, value := range conf {
+		byteValue := []byte(value)
+		result = append(result, byteValue...)
+	}
+
+	return result, nil
 }
 
 /*

@@ -37,6 +37,37 @@ func TestInitConfig(t *testing.T) {
 		return
 	}
 
+	//以#v方式打印的uint是16进制数显示
 	t.Logf("unmarshal success, conf:%#v, port:%v", conf, conf.ServerConf.Port)
 
+	confData, err := Marshal(conf)
+	if err != nil {
+		t.Errorf("marshal failed, err:%v", err)
+	}
+
+	t.Logf("marshal succ, conf:%s", string(confData))
+
+}
+
+func TestIniConfigFile(t *testing.T) {
+
+	//将数据结构的数据写入配置文件
+	filename := "D:/tmp/test.conf"
+	var conf Config
+	conf.ServerConf.Ip = "localhost"
+	conf.ServerConf.Port = 9009
+	err := MarshalFile(filename, conf)
+	if err != nil {
+		t.Errorf("marshal failed, err:%v", err)
+		return
+	}
+
+	//将配置文件的数据写入数据结构
+	var conf2 Config
+	err = UnMarshalFile(filename, &conf2)
+	if err != nil {
+		t.Errorf("unmarshal failed, err:%v", err)
+	}
+
+	t.Logf("unmarshal succ, conf:%#v", conf2)
 }

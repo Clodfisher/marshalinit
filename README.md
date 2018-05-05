@@ -79,7 +79,7 @@ func UnMarshal(data []byte, result interface{}) (err error)
 func Marshal(data interface{}) (result []byte, err error)
 ```    
  1. 将需要序列化成切片的结构体类型传入此函数。    
- 2. 利用反射判定datal类型是否为结构体类型。    
+ 2. 利用反射判定data类型是否为结构体类型。    
  3. 获取每一个section的类型，判定是否为结构体类型。    
  4. 通过section类型中的tag获取其在切片数据中应该具有的名字。    
  5. 将名字和[]组成在切片中的section内容。    
